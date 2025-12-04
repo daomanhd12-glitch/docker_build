@@ -1,0 +1,77 @@
+name: R36S Android Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    env:
+      BUILD_TARGET: lineage_r36s-userdebug
+      REPO_SYNC_JOBS: 4
+      BUILD_JOBS: 8
+      LOCAL_MANIFESTS_BRANCH: main
+      WORKDIR: /build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install required packages
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            bc bison build-essential curl flex g++-multilib gcc-multilib \
+            git git-lfs gnupg gperf imagemagick lib32ncurses5-dev \
+            lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev \
+            libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush \
+            schedtool squashfs-tools xsltproc zip zlib1g-dev unzip python3 \
+            ccache rsync
+
+          git lfs install
+
+      - name: Install OpenJDK 8
+        run: |
+          sudo apt install -y openjdk-8-jdk
+          echo "JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> $GITHUB_ENV
+
+      - name: Install repo tool
+        run: |
+          curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+          chmod a+x repo
+          sudo mv repo /usr/local/bin/repo
+
+      - name: Prepare build directory
+        run: |
+          sudo mkdir -p /build
+          sudo chown $USER:$USER /build
+
+      # Cache Android repo (.repo folder)
+      - name: Cache .repo directory
+        uses: actions/cache@v3
+        with:
+          path: /build/.repo
+          key: r36s-repo-${{ github.run_id }}
+          restore-keys: r36s-repo-
+
+      - name: Copy build script
+        run: |
+          cp build.sh /build/build.sh
+          chmod +x /build/build.sh
+
+      - name: Run build script
+        run: |
+          cd /build
+          ./build.sh
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: R36S-Build-Output
+          path: /build/results/*.zip
+          
