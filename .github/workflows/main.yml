@@ -34,7 +34,12 @@ jobs:
             ccache rsync
 
           git lfs install
-
+- name: Install repo tool
+  run: |
+    curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+    chmod a+x repo
+    sudo mv repo /usr/local/bin/repo
+    
       - name: Install OpenJDK 8
         run: |
           sudo apt install -y openjdk-8-jdk
