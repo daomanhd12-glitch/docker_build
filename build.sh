@@ -79,13 +79,7 @@ else
 fi
 
 # Upgrade repo to latest version
-echo -e "${BLUE}[DEBUG] Checking for repo upgrade...${NC}"
-if [ -f ".repo/repo/repo" ]; then
-    echo -e "${YELLOW}Upgrading repo to latest version...${NC}"
-    cp .repo/repo/repo /usr/bin/repo
-    echo -e "${GREEN}Repo upgraded successfully${NC}"
-    /usr/bin/repo version
-fi
+
 
 # Sync sources
 echo -e "${YELLOW}Syncing repository (this may take a while on first run)...${NC}"
