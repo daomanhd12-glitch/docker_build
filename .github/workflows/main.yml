@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-lastest-l
+    runs-on: ubuntu-latest-xl
 
     env:
       BUILD_TARGET: lineage_r36s-userdebug
